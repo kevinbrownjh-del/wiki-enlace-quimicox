@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Wiki del enlace químico: TEV y TOM</title>
+<style>
+:root{
+  --paper:#F6F8FB; --panel:#FFFFFF; --ink:#16202E; --muted:#556176; --line:#D3DAE5;
+  --plus:#2563C9; --plus-t:#E5EEFB; --plus-d:#143A7A;
+  --minus:#D9480F; --minus-t:#FDEADB; --minus-ink:#A8370A;
+  --grid:rgba(37,99,201,.07);
+  --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;color:var(--ink);font:16px/1.65 var(--sans);background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+:focus-visible{outline:3px solid var(--minus);outline-offset:2px}
+a.in,button.link{color:var(--plus);text-decoration:underline;cursor:pointer}
+button.link{font:inherit;background:none;border:0;padding:0}
+
+/* Cabecera */
+.bar{background:#fff;border-bottom:1px solid var(--line)}
+.bar .in{max-width:none;margin:0;padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-size:1.35rem;font-weight:700;line-height:1.15}
+.brand small{display:block;font:400 .82rem var(--sans);color:var(--muted)}
+.search{position:relative}
+.search input{width:min(290px,72vw);padding:8px 12px;border:1px solid var(--line);border-radius:4px;font:inherit;background:#fff;color:var(--ink)}
+#results{position:absolute;right:0;top:100%;margin-top:4px;width:min(380px,92vw);background:#fff;border:1px solid var(--line);border-radius:4px;box-shadow:0 6px 18px rgba(22,32,46,.14);z-index:20;max-height:320px;overflow:auto}
+#results[hidden]{display:none}
+#results button{display:block;width:100%;text-align:left;font:inherit;padding:9px 12px;border:0;border-bottom:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}
+#results button:last-child{border-bottom:0}
+#results button:hover{background:var(--plus-t)}
+#results small{display:block;color:var(--muted)}
+#results p{margin:0;padding:10px 12px;color:var(--muted)}
+
+/* Estructura */
+.shell{max-width:none;margin:0;padding:12px;display:grid;grid-template-columns:208px minmax(0,1fr);gap:24px;align-items:start}
+.side{position:sticky;top:16px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 0}
+.side .lbl{font-weight:700;font-size:.85rem;color:var(--muted);padding:2px 16px 6px}
+.side button{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;padding:8px 16px;border:0;border-left:3px solid transparent;background:none;color:var(--ink);cursor:pointer}
+.side button:hover{background:var(--paper)}
+.side button[aria-current="page"]{border-left-color:var(--plus);background:var(--plus-t);color:var(--plus-d);font-weight:700}
+@media(max-width:800px){
+  .shell{grid-template-columns:1fr;padding:0 0 20px;gap:0}
+  .side{position:sticky;top:0;z-index:6;display:flex;overflow-x:auto;padding:0;border-radius:0;border-width:0 0 1px 0}
+  .side .lbl{display:none}
+  .side button{width:auto;white-space:nowrap;border-left:0;border-bottom:3px solid transparent}
+  .side button[aria-current="page"]{border-bottom-color:var(--plus)}
+  .art{border-radius:0;margin:12px 0 0;padding:22px 16px 30px}
+}
+
+/* Artículos */
+.art{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:28px 34px 38px;min-width:0}
+.art[hidden]{display:none}
+.art::after{content:"";display:block;clear:both}
+h1,h2{font-family:var(--serif);font-weight:700;letter-spacing:-.01em}
+h1{font-size:2.15rem;line-height:1.15;margin:0 0 .6em;padding-bottom:.25em;border-bottom:1px solid var(--line)}
+h2{font-size:1.5rem;line-height:1.25;margin:1.8em 0 .6em;padding-bottom:.15em;border-bottom:1px solid var(--line);clear:both}
+h3{font:700 1.1rem/1.35 var(--sans);margin:1.6em 0 .4em}
+h2,h3{scroll-margin-top:72px}
+.num{color:var(--muted);font-weight:400;margin-right:.1em}
+p,li,dd{max-width:72ch}
+p{margin:0 0 1em}
+.lead{font-family:var(--serif);font-size:1.15rem;line-height:1.55;color:#2B3748}
+.ph{background:#FFF3B0;padding:0 3px;border-radius:2px}
+sub,sup{line-height:0}
+
+.infobox{float:right;width:276px;margin:4px 0 16px 26px;border:1px solid var(--line);background:var(--paper);font-size:.9rem;border-radius:4px}
+.infobox .ttl{background:var(--plus-t);color:var(--plus-d);font-weight:700;text-align:center;padding:8px 10px;border-radius:4px 4px 0 0}
+.infobox dl{margin:0;padding:6px 12px 10px}
+.infobox dt{font-weight:700;color:var(--muted);font-size:.82rem;margin-top:8px}
+.infobox dd{margin:0}
+@media(max-width:700px){.infobox{float:none;width:auto;margin:0 0 16px}}
+
+.toc{display:inline-block;max-width:100%;border:1px solid var(--line);background:#fff;padding:10px 20px 10px 16px;margin:4px 0 12px;font-size:.92rem;border-radius:4px}
+.toc strong{display:block;margin-bottom:4px}
+.toc ul{list-style:none;margin:0;padding:0}
+.toc li{margin:2px 0}
+.toc li.l2{padding-left:1.2em}
+.toc a{color:var(--plus);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+.callout{border-left:4px solid var(--plus);background:var(--plus-t);padding:14px 18px;margin:20px 0;border-radius:0 4px 4px 0;max-width:76ch}
+.callout.warm{border-left-color:var(--minus);background:var(--minus-t)}
+.callout p:last-child{margin-bottom:0}
+.callout strong.t{display:block;margin-bottom:4px}
+.eq{font-family:var(--serif);font-size:1.1rem;text-align:center;margin:8px 0;font-style:italic}
+.chain{font-family:var(--serif);font-size:1.05rem;text-align:center;margin:14px 0;color:var(--plus-d)}
+.see{border-top:1px solid var(--line);margin-top:2em;padding-top:.8em;font-size:.95rem;clear:both}
+
+ul.tight,ol.tight{padding-left:1.25em;margin:0 0 1em}
+ul.tight li,ol.tight li{margin-bottom:.45em}
+figure{margin:22px 0;clear:both}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:8px;max-width:72ch}
+svg text{font-family:var(--sans)}
+
+.tablewrap{overflow-x:auto;margin:14px 0 22px;border:1px solid var(--line);border-radius:4px;clear:both}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+th,td{text-align:left;padding:9px 12px;vertical-align:top;border-bottom:1px solid var(--line)}
+thead th{background:var(--plus-t);color:var(--plus-d)}
+tbody tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+
+.lab{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin:20px 0;clear:both}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin:0 0 8px}
+.ctrl label{font-weight:600}
+select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink)}
+input[type=range]{width:min(420px,100%);accent-color:var(--plus)}
+.pair{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.pair svg{flex:1 1 280px;min-width:0;height:auto}
+.readout{margin:8px 0 0;min-height:3em}
+.note{font-size:.88rem;color:var(--muted);margin:8px 0 0}
+dl.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:0}
+dl.kv dt{font-weight:600;color:var(--muted)}
+dl.kv dd{margin:0}
+@media(max-width:560px){dl.kv{grid-template-columns:1fr}dl.kv dt{margin-top:8px}}
+
+.btn{font:600 .95rem var(--sans);padding:9px 16px;border-radius:4px;border:1px solid var(--plus);background:var(--plus);color:#fff;cursor:pointer}
+.btn.alt{background:#fff;color:var(--plus)}
+.btn:hover{filter:brightness(.94)}
+fieldset{border:0;padding:0;margin:0 0 22px}
+legend{font-weight:700;padding:0;margin-bottom:6px;max-width:72ch}
+fieldset label{display:block;padding:6px 8px;border-radius:4px;cursor:pointer}
+fieldset label:hover{background:var(--plus-t)}
+.fb{margin:4px 0 0 8px;font-size:.93rem;min-height:1.2em}
+.fb.ok{color:#0B6B3A}.fb.bad{color:var(--minus-ink)}
+#score{font-weight:700;margin-left:6px}
+ul.refs{list-style:none;padding:0;margin:0}
+ul.refs li{padding-left:2em;text-indent:-2em;margin-bottom:.9em}
+footer{max-width:none;margin:0;padding:0 16px 28px;font-size:.88rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="in">
+    <div class="brand">Wiki del enlace químico<small>Teoría del enlace de valencia y teoría de orbitales moleculares</small></div>
+    <div class="search">
+      <input id="q" type="search" placeholder="Buscar en la wiki" aria-label="Buscar en la wiki" autocomplete="off">
+      <div id="results" hidden></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="side" aria-label="Contenidos de la wiki">
+    <div class="lbl">Contenidos</div>
+    <button type="button" data-go="inicio" aria-current="page">Inicio y antecedentes</button>
+    <button type="button" data-go="tev">Teoría del enlace de valencia</button>
+    <button type="button" data-go="tom">Teoría de orbitales moleculares</button>
+    <button type="button" data-go="comp">Comparación y conclusiones</button>
+    <button type="button" data-go="quiz">Autoevaluación</button>
+    <button type="button" data-go="ref">Referencias</button>
+    <button type="button" data-go="equipo">Equipo de trabajo</button>
+  </nav>
+
+  <main>
+
+<!-- ================= INICIO ================= -->
+<article class="art" id="p-inicio" data-id="inicio">
+  <h1>Enlace químico: introducción y antecedentes</h1>
+
+  <aside class="infobox" aria-label="Cronología">
+    <div class="ttl">Cronología</div>
+    <dl>
+      <dt>1916</dt><dd>Lewis: el enlace covalente como par de electrones compartido.</dd>
+      <dt>1927</dt><dd>Heitler y London: primer tratamiento cuántico del enlace en el H<sub>2</sub>.</dd>
+      <dt>Década de 1930</dt><dd>Pauling: hibridación y resonancia; desarrollo de la TEV.</dd>
+      <dt>Décadas de 1920 y 1930</dt><dd>Hund y Mulliken: desarrollo de la TOM.</dd>
+      <dt>1966</dt><dd>Mulliken recibe el Premio Nobel de Química.</dd>
+    </dl>
+  </aside>
+
+  <p class="lead">Esta wiki presenta las dos teorías cuánticas que explican cómo se forma y por qué es estable un enlace químico: la teoría del enlace de valencia (TEV) y la teoría de orbitales moleculares (TOM).</p>
+  <div class="toc"><strong>Contenido</strong></div>
+
+  <h2>Introducción</h2>
+  <p>Los enlaces químicos son fundamentales para comprender cómo los átomos se unen y forman moléculas y estructuras estables. Su estudio permite explicar diversas propiedades de las sustancias, como su estabilidad, geometría molecular, reactividad y comportamiento físico.</p>
+  <p>A lo largo de la historia, los científicos han desarrollado diferentes modelos para explicar la naturaleza de estas uniones. Las primeras propuestas se centraron en la participación de los electrones de valencia y en la tendencia de los átomos a alcanzar configuraciones electrónicas estables. Sin embargo, estos planteamientos presentaban limitaciones para explicar el origen de los enlaces y el comportamiento de determinadas moléculas.</p>
+  <p>Con el desarrollo de la mecánica cuántica durante el siglo XX, surgieron nuevas interpretaciones basadas en el comportamiento ondulatorio de los electrones y sus interacciones con los núcleos atómicos. Estos avances dieron lugar a dos enfoques fundamentales: la Teoría del Enlace de Valencia (TEV) y la Teoría de Orbitales Moleculares (TOM).</p>
+  <p>Ambas teorías ofrecen perspectivas diferentes, pero complementarias, sobre la formación y naturaleza de los enlaces. Su desarrollo estuvo marcado por las contribuciones de científicos como Gilbert N. Lewis, Walter Heitler, Fritz London, Linus Pauling y Robert S. Mulliken, cuyos aportes sentaron las bases de la comprensión moderna de la estructura molecular.</p>
+
+  <h2>Antecedentes</h2>
+  <h3>Gilbert Newton Lewis (1916): el enlace como un par de electrones compartidos</h3>
+  <p>En 1916, Gilbert N. Lewis propuso que el enlace covalente se forma cuando dos átomos comparten uno o más pares de electrones, contribuyendo a explicar la estabilidad de las moléculas (Lewis, 1916). También desarrolló las estructuras de Lewis, que representan los electrones de valencia mediante puntos, y contribuyó a establecer la regla del octeto, según la cual muchos átomos tienden a alcanzar ocho electrones en su capa externa (Gillespie & Robinson, 2007).</p>
+  <p>Su propuesta permitió comprender de manera más sencilla cómo se unen los átomos para formar moléculas. Por ejemplo, en la molécula de hidrógeno (H<sub>2</sub>), cada átomo aporta un electrón para formar un par compartido, alcanzando así una configuración electrónica estable. Sin embargo, su modelo presentaba limitaciones, ya que no explicaba el origen físico de la estabilidad de los enlaces ni ciertas propiedades moleculares.</p>
+
+  <h3>Walter Heitler y Fritz London (1927): explicación cuántica del enlace covalente</h3>
+  <p>En 1927, los físicos Walter Heitler y Fritz London realizaron una de las primeras aplicaciones de la mecánica cuántica al estudio del enlace covalente, utilizando como referencia la molécula de hidrógeno (H<sub>2</sub>). A través de funciones de onda, describieron matemáticamente el comportamiento de los electrones y demostraron cómo sus interacciones podían favorecer la formación de una molécula estable (Heitler & London, 1927).</p>
+  <p>Su investigación permitió comprender que la estabilidad del enlace no depende únicamente de compartir electrones, como había propuesto Lewis, sino también de las propiedades cuánticas del sistema. Explicaron que, cuando dos átomos se aproximan, las interacciones entre sus electrones y núcleos pueden dar lugar a un estado de menor energía, siempre que exista una distribución electrónica favorable. Este planteamiento permitió relacionar la formación del enlace con la energía y el comportamiento de los electrones.</p>
+
+  <h3>Linus Pauling (década de 1930): desarrollo de la Teoría del Enlace de Valencia</h3>
+  <p>Durante la década de 1930, el químico Linus Pauling amplió los fundamentos cuánticos establecidos por Heitler y London, contribuyendo al desarrollo de la Teoría del Enlace de Valencia (TEV). Sus investigaciones permitieron explicar la formación de enlaces covalentes mediante la interacción de orbitales atómicos, relacionando su orientación espacial con la geometría y estabilidad de las moléculas (Pauling, 1931, 1960).</p>
+  <p>Una de sus principales contribuciones fue el concepto de hibridación de orbitales, que permite describir cómo se combinan orbitales atómicos para formar nuevos orbitales orientados en determinadas direcciones. Por ejemplo, en la molécula de metano (CH<sub>4</sub>), el carbono presenta una hibridación sp<sup>3</sup> que permite representar sus cuatro enlaces equivalentes con una geometría tetraédrica. Además, Pauling desarrolló el concepto de resonancia para explicar moléculas cuya estructura electrónica no puede representarse adecuadamente mediante una única estructura de Lewis.</p>
+
+  <h3>Robert Sanderson Mulliken (décadas de 1920 y 1930): desarrollo de la Teoría de Orbitales Moleculares</h3>
+  <p>Robert S. Mulliken fue uno de los principales impulsores de la Teoría de Orbitales Moleculares (TOM), cuyo desarrollo representó un avance fundamental en la comprensión del enlace químico mediante la mecánica cuántica. Su enfoque propuso que los electrones de una molécula pueden ocupar orbitales moleculares que se extienden sobre varios núcleos atómicos, en lugar de encontrarse necesariamente localizados entre dos átomos (Mulliken, 1966).</p>
+  <p>En colaboración con otros investigadores, como Friedrich Hund, Mulliken desarrolló métodos para estudiar la distribución electrónica y comprender las propiedades de las moléculas. Sus investigaciones permitieron distinguir entre orbitales enlazantes y antienlazantes, cuya ocupación electrónica influye en la estabilidad molecular. Esta teoría también permitió explicar fenómenos como el paramagnetismo del oxígeno (O<sub>2</sub>), que no podía interpretarse correctamente mediante las estructuras de Lewis convencionales (Atkins et al., 2018). En 1966, Mulliken recibió el Premio Nobel de Química por sus trabajos fundamentales sobre el enlace químico y la estructura electrónica de las moléculas mediante el método de orbitales moleculares (Mulliken, 1966).</p>
+
+  <h3>Síntesis histórica</h3>
+  <p>La evolución de las teorías del enlace químico refleja cómo los avances científicos permitieron comprender con mayor profundidad las interacciones entre los átomos. Desde el modelo de electrones compartidos propuesto por Lewis hasta las interpretaciones cuánticas desarrolladas por Heitler, London, Pauling y Mulliken, cada contribución amplió el conocimiento sobre la formación y estabilidad de las moléculas. Estos aportes sentaron las bases de la Teoría del Enlace de Valencia (TEV) y la Teoría de Orbitales Moleculares (TOM), dos enfoques fundamentales que permiten interpretar la naturaleza de los enlaces y las propiedades de las sustancias.</p>
+
+  <h2>Pregunta guía</h2>
+  <div class="callout warm">
+    <p><strong>¿Cómo explican la Teoría del Enlace de Valencia (TEV) y la Teoría de Orbitales Moleculares (TOM) la formación y estabilidad de los enlaces químicos a partir del comportamiento de los electrones?</strong></p>
+    <p>La respuesta se desarrolla en las secciones de cada teoría y se resume en <button class="link" type="button" data-goto="comp">Comparación y conclusiones</button>.</p>
+  </div>
+
+  <p class="see"><strong>Véase también:</strong> <button class="link" type="button" data-goto="tev">Teoría del enlace de valencia</button>, <button class="link" type="button" data-goto="tom">Teoría de orbitales moleculares</button>, <button class="link" type="button" data-goto="ref">Referencias</button>.</p>
+</article>
+
+<!-- ================= TEV ================= -->
+<article class="art" id="p-tev" data-id="tev" hidden>
+  <h1>Teoría del enlace de valencia (TEV)</h1>
+
+  <aside class="infobox" aria-label="Ficha de la TEV">
+    <div class="ttl">Ficha de la TEV</div>
+    <dl>
+      <dt>Origen</dt><dd>Heitler y London (1927); ampliada por Pauling en la década de 1930.</dd>
+      <dt>Idea central</dt><dd>Enlace por solapamiento de orbitales atómicos; pareja de electrones localizada entre dos átomos.</dd>
+      <dt>Conceptos clave</dt><dd>Enlaces σ y π, hibridación, resonancia.</dd>
+      <dt>Explica bien</dt><dd>Geometría molecular y la formación de enlaces simples, dobles y triples.</dd>
+      <dt>Limitación principal</dt><dd>No predice el paramagnetismo del O<sub>2</sub>.</dd>
+    </dl>
+  </aside>
+
+  <p class="lead">La TEV describe el enlace covalente como el solapamiento de orbitales atómicos y a los electrones del enlace como una pareja localizada entre dos átomos.</p>
+  <div class="toc"><strong>Contenido</strong></div>
+
+  <h2>Idea central</h2>
+  <p>Según la TEV, un enlace covalente se forma cuando dos orbitales atómicos, cada uno con un electrón desapareado, se solapan y los dos electrones, con espines opuestos, pasan a ocupar la región compartida entre los núcleos. Ese solapamiento reduce la energía del sistema respecto a la de los átomos separados, y esa disminución de energía es lo que da estabilidad al enlace (Brown et al., 2018; Atkins et al., 2018).</p>
+  <p>Los electrones del enlace se consideran localizados entre los dos átomos que los comparten. Por eso cada enlace se representa como una pareja de electrones, igual que en las estructuras de Lewis, pero con una justificación cuántica: el solapamiento de las funciones de onda de los orbitales. Cuanto mayor es el solapamiento, más fuerte es el enlace (Brown et al., 2018). El primer tratamiento cuántico de este tipo fue el de Heitler y London para el H<sub>2</sub> (Heitler & London, 1927), y Pauling lo extendió a moléculas poliatómicas (Pauling, 1931).</p>
+
+  <h2>El caso del H<sub>2</sub></h2>
+  <p>En el H<sub>2</sub>, cada átomo aporta un electrón en un orbital 1s. Cuando los átomos están lejos, casi no interactúan. Al acercarse, los orbitales 1s se solapan y la energía disminuye hasta un mínimo. Si se acercan más, la repulsión entre los núcleos y entre los electrones hace que la energía vuelva a subir. El mínimo corresponde a la longitud de enlace, cercana a 74 pm, y la profundidad del mínimo a la energía de enlace, de unos 436 kJ/mol (Brown et al., 2018).</p>
+  <p>Mueve el control para acercar o alejar los átomos y observa el solapamiento y la energía.</p>
+  <div class="lab">
+    <div class="ctrl">
+      <label for="rng">Distancia entre núcleos</label>
+      <input type="range" id="rng" min="50" max="300" step="2" value="220">
+    </div>
+    <div class="pair">
+      <svg viewBox="0 0 400 156" role="img" aria-label="Dos átomos de hidrógeno con sus orbitales 1s">
+        <circle id="aL" cx="140" cy="72" r="64" fill="#2563C9" fill-opacity=".3" stroke="#2563C9" stroke-width="1.5"/>
+        <circle id="aR" cx="260" cy="72" r="64" fill="#2563C9" fill-opacity=".3" stroke="#2563C9" stroke-width="1.5"/>
+        <circle id="nL" cx="140" cy="72" r="4" fill="#16202E"/>
+        <circle id="nR" cx="260" cy="72" r="4" fill="#16202E"/>
+        <text id="tL" x="140" y="148" text-anchor="middle" font-size="13" fill="#556176">H</text>
+        <text id="tR" x="260" y="148" text-anchor="middle" font-size="13" fill="#556176">H</text>
+      </svg>
+      <svg viewBox="0 0 340 210" role="img" aria-label="Energía potencial del H2 en función de la distancia entre núcleos">
+        <line x1="44" y1="36" x2="324" y2="36" stroke="#556176" stroke-dasharray="4 4"/>
+        <line x1="44" y1="20" x2="44" y2="180" stroke="#556176"/>
+        <line x1="44" y1="180" x2="324" y2="180" stroke="#556176"/>
+        <line id="r0line" x1="0" y1="36" x2="0" y2="180" stroke="#D9480F" stroke-dasharray="3 3"/>
+        <path id="curve" d="" fill="none" stroke="#2563C9" stroke-width="2.5"/>
+        <circle id="mk" cx="44" cy="36" r="6" fill="#D9480F" stroke="#fff" stroke-width="2"/>
+        <text x="40" y="40" text-anchor="end" font-size="11" fill="#556176">0</text>
+        <text x="40" y="170" text-anchor="end" font-size="11" fill="#556176">−436</text>
+        <text x="48" y="16" font-size="11" fill="#556176">E (kJ/mol)</text>
+        <text x="184" y="203" text-anchor="middle" font-size="11" fill="#556176">distancia entre núcleos r (pm)</text>
+        <text id="x100" y="193" text-anchor="middle" font-size="10" fill="#556176">100</text>
+        <text id="x200" y="193" text-anchor="middle" font-size="10" fill="#556176">200</text>
+        <text id="x300" y="193" text-anchor="middle" font-size="10" fill="#556176">300</text>
+        <text id="x74" y="30" text-anchor="middle" font-size="10" fill="#A8370A">74 pm</text>
+      </svg>
+    </div>
+    <p class="readout" id="h2out" aria-live="polite"></p>
+    <p class="note">La curva es un modelo ilustrativo (potencial de Morse) con r<sub>0</sub> = 74 pm y energía de enlace de 436 kJ/mol. La energía se mide respecto a los átomos separados.</p>
+  </div>
+
+  <h2>Enlaces σ y π</h2>
+  <p>Los enlaces se clasifican según la simetría del solapamiento. En un enlace σ, el solapamiento ocurre a lo largo del eje que une los núcleos y la densidad electrónica se concentra sobre ese eje. Puede formarse entre dos orbitales s, entre un s y un p, entre dos p orientados de frente o con orbitales híbridos. En un enlace π, dos orbitales p paralelos se solapan lateralmente, de modo que la densidad electrónica queda por encima y por debajo del eje, con un plano nodal que contiene a los núcleos (Brown et al., 2018).</p>
+  <figure>
+    <svg viewBox="0 0 720 200" role="img" aria-label="Tres esquemas de solapamiento: s con s, p con p de frente y p con p lateral">
+      <line x1="30" y1="95" x2="210" y2="95" stroke="#556176" stroke-dasharray="4 4"/>
+      <circle cx="100" cy="95" r="38" fill="#2563C9" fill-opacity=".4" stroke="#2563C9" stroke-width="1.5"/>
+      <circle cx="140" cy="95" r="38" fill="#2563C9" fill-opacity=".4" stroke="#2563C9" stroke-width="1.5"/>
+      <circle cx="100" cy="95" r="3.5" fill="#16202E"/><circle cx="140" cy="95" r="3.5" fill="#16202E"/>
+      <text x="120" y="178" text-anchor="middle" font-size="14" font-weight="700" fill="#16202E">σ (s con s)</text>
+      <line x1="250" y1="95" x2="470" y2="95" stroke="#556176" stroke-dasharray="4 4"/>
+      <ellipse cx="292" cy="95" rx="28" ry="18" fill="#D9480F" fill-opacity=".5" stroke="#D9480F" stroke-width="1.5"/>
+      <ellipse cx="348" cy="95" rx="28" ry="18" fill="#2563C9" fill-opacity=".5" stroke="#2563C9" stroke-width="1.5"/>
+      <ellipse cx="372" cy="95" rx="28" ry="18" fill="#2563C9" fill-opacity=".5" stroke="#2563C9" stroke-width="1.5"/>
+      <ellipse cx="428" cy="95" rx="28" ry="18" fill="#D9480F" fill-opacity=".5" stroke="#D9480F" stroke-width="1.5"/>
+      <circle cx="320" cy="95" r="3.5" fill="#16202E"/><circle cx="400" cy="95" r="3.5" fill="#16202E"/>
+      <text x="360" y="178" text-anchor="middle" font-size="14" font-weight="700" fill="#16202E">σ (p con p, de frente)</text>
+      <line x1="510" y1="95" x2="700" y2="95" stroke="#556176" stroke-dasharray="4 4"/>
+      <ellipse cx="583" cy="67" rx="24" ry="28" fill="#2563C9" fill-opacity=".5" stroke="#2563C9" stroke-width="1.5"/>
+      <ellipse cx="583" cy="123" rx="24" ry="28" fill="#D9480F" fill-opacity=".5" stroke="#D9480F" stroke-width="1.5"/>
+      <ellipse cx="617" cy="67" rx="24" ry="28" fill="#2563C9" fill-opacity=".5" stroke="#2563C9" stroke-width="1.5"/>
+      <ellipse cx="617" cy="123" rx="24" ry="28" fill="#D9480F" fill-opacity=".5" stroke="#D9480F" stroke-width="1.5"/>
+      <circle cx="583" cy="95" r="3.5" fill="#16202E"/><circle cx="617" cy="95" r="3.5" fill="#16202E"/>
+      <text x="600" y="178" text-anchor="middle" font-size="14" font-weight="700" fill="#16202E">π (p con p, lateral)</text>
+    </svg>
+    <figcaption>Figura 1. Tipos de solapamiento. La línea punteada es el eje que une los núcleos; azul y naranja indican fases opuestas del orbital. Elaboración propia con fines didácticos.</figcaption>
+  </figure>
+  <p>El solapamiento lateral es menos efectivo que el frontal, por lo que un enlace π suele ser más débil que uno σ. Además, el enlace π impide la rotación libre alrededor del eje de enlace. Un enlace simple es siempre σ; uno doble está formado por un σ y un π; uno triple, por un σ y dos π (Brown et al., 2018). Por ejemplo:</p>
+  <ul class="tight">
+    <li>N<sub>2</sub>: un enlace σ y dos enlaces π.</li>
+    <li>Eteno (C<sub>2</sub>H<sub>4</sub>): cinco enlaces σ (cuatro C–H y un C–C) y un enlace π.</li>
+    <li>Etino (C<sub>2</sub>H<sub>2</sub>): tres enlaces σ (dos C–H y un C–C) y dos enlaces π.</li>
+  </ul>
+
+  <h2>Hibridación</h2>
+  <p>La hibridación es un modelo utilizado dentro de la TEV para explicar la geometría molecular y la orientación de los enlaces. Consiste en la combinación matemática de orbitales atómicos de un mismo átomo para originar nuevos orbitales, denominados orbitales híbridos, que poseen orientaciones espaciales definidas (Brown et al., 2018).</p>
+  <p>Los orbitales híbridos se forman antes de considerar la superposición que produce el enlace químico. Su número es igual al número de orbitales atómicos que se combinan. Por ejemplo, si se combina un orbital s con tres orbitales p, se generan cuatro orbitales híbridos sp<sup>3</sup>.</p>
+  <h3>Tipos principales de hibridación</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Hibridación</th><th>Orbitales combinados</th><th>Orbitales híbridos</th><th>Geometría</th><th>Ángulo</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td>sp</td><td>1 s + 1 p</td><td>2</td><td>Lineal</td><td>180°</td><td>BeCl<sub>2</sub> / C en C<sub>2</sub>H<sub>2</sub></td></tr>
+        <tr><td>sp<sup>2</sup></td><td>1 s + 2 p</td><td>3</td><td>Trigonal plana</td><td>120°</td><td>BF<sub>3</sub> / C en C<sub>2</sub>H<sub>4</sub></td></tr>
+        <tr><td>sp<sup>3</sup></td><td>1 s + 3 p</td><td>4</td><td>Tetraédrica</td><td>109,5°</td><td>CH<sub>4</sub></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Ejemplo: metano (CH<sub>4</sub>)</h3>
+  <p>En el metano, el átomo de carbono forma cuatro enlaces C–H equivalentes. Para explicar esta equivalencia, se considera que un orbital 2s y tres orbitales 2p del carbono se combinan para generar cuatro orbitales sp<sup>3</sup> equivalentes. Estos orbitales se orientan hacia los vértices de un tetraedro, con ángulos H–C–H cercanos a 109,5°.</p>
+  <h3>Relación con enlaces σ y π</h3>
+  <p>Los orbitales híbridos participan principalmente en la formación de enlaces sigma (σ). Cuando quedan orbitales p sin hibridar, estos pueden superponerse lateralmente y formar enlaces pi (π). Por eso, en el eteno (C<sub>2</sub>H<sub>4</sub>) cada carbono es sp<sup>2</sup> y queda un orbital p sin hibridar para formar el enlace π; en el etino (C<sub>2</sub>H<sub>2</sub>) cada carbono es sp y quedan dos orbitales p sin hibridar para formar dos enlaces π.</p>
+
+  <h2>Resonancia</h2>
+  <p>La resonancia se utiliza cuando una molécula o ion no puede representarse adecuadamente mediante una sola estructura de Lewis. En esos casos se escriben dos o más estructuras resonantes o contribuyentes, las cuales mantienen la misma disposición de los núcleos atómicos y difieren únicamente en la distribución de los electrones (Brown et al., 2018).</p>
+  <p>Es importante aclarar que la molécula real no cambia o «salta» entre las diferentes estructuras dibujadas. La estructura verdadera corresponde a un híbrido de resonancia, en el cual la densidad electrónica está deslocalizada sobre varios átomos.</p>
+  <h3>Ejemplo: ion carbonato (CO<sub>3</sub><sup>2−</sup>)</h3>
+  <p>El ion carbonato puede representarse mediante tres estructuras resonantes equivalentes. En cada estructura de Lewis aparece un enlace C=O y dos enlaces C–O<sup>−</sup>, pero experimentalmente los tres enlaces C–O son equivalentes. La resonancia permite explicar esta equivalencia: los electrones π están deslocalizados entre los tres enlaces C–O.</p>
+  <figure>
+    <svg id="res" viewBox="0 0 600 140" role="img" aria-label="Tres estructuras resonantes del ion carbonato, unidas por flechas dobles"></svg>
+    <figcaption>Figura 2. Estructuras resonantes del CO<sub>3</sub><sup>2−</sup>. Se omiten los pares libres para simplificar. Elaboración propia con fines didácticos.</figcaption>
+  </figure>
+  <p class="chain">Estructuras resonantes ↔ deslocalización electrónica ↔ mayor estabilidad</p>
+  <div class="callout">
+    <strong class="t">Consecuencia importante</strong>
+    <p>Cuando existe resonancia, algunos enlaces presentan una longitud y una energía intermedias entre las esperadas para un enlace simple y un enlace doble. Esto ocurre porque la densidad electrónica no se encuentra localizada en un único enlace.</p>
+  </div>
+
+  <h2>Limitaciones de la teoría del enlace de valencia</h2>
+  <p>La TEV es muy útil para comprender cómo se forman los enlaces covalentes, la geometría molecular y la hibridación. Sin embargo, su versión más sencilla no describe satisfactoriamente todas las propiedades observadas en las moléculas (Atkins et al., 2018).</p>
+  <ul class="tight">
+    <li><strong>Localización de los enlaces:</strong> la TEV describe de manera natural los enlaces como pares de electrones localizados entre dos átomos. Para sistemas con electrones deslocalizados necesita recurrir a estructuras de resonancia.</li>
+    <li><strong>Propiedades magnéticas:</strong> el modelo básico de Lewis/TEV no explica adecuadamente algunas propiedades magnéticas. El ejemplo clásico es el O<sub>2</sub>, que presenta paramagnetismo debido a electrones desapareados.</li>
+    <li><strong>Distribución electrónica global:</strong> la TEV no representa de forma tan directa orbitales extendidos sobre toda una molécula, especialmente en sistemas altamente deslocalizados.</li>
+    <li><strong>Espectros y estados electrónicos:</strong> para interpretar con mayor profundidad espectros electrónicos, energías orbitales y ciertos estados excitados, es más conveniente utilizar la Teoría de Orbitales Moleculares.</li>
+  </ul>
+  <h3>Ejemplo clave: el O<sub>2</sub></h3>
+  <p>Una estructura de Lewis sencilla para O<sub>2</sub> representa un doble enlace O=O y todos los electrones apareados. Sin embargo, el oxígeno molecular es paramagnético: es atraído por un campo magnético porque posee electrones desapareados. Este comportamiento se explica de manera más satisfactoria mediante la Teoría de Orbitales Moleculares (TOM), como se desarrolla en la <button class="link" type="button" data-goto="tom">sección de la TOM</button>.</p>
+
+  <p class="see"><strong>Véase también:</strong> <button class="link" type="button" data-goto="tom">Teoría de orbitales moleculares</button>, <button class="link" type="button" data-goto="comp">Comparación y conclusiones</button>.</p>
+</article>
+
+<!-- ================= TOM ================= -->
+<article class="art" id="p-tom" data-id="tom" hidden>
+  <h1>Teoría de orbitales moleculares (TOM)</h1>
+
+  <aside class="infobox" aria-label="Ficha de la TOM">
+    <div class="ttl">Ficha de la TOM</div>
+    <dl>
+      <dt>Origen</dt><dd>Hund y Mulliken, décadas de 1920 y 1930.</dd>
+      <dt>Idea central</dt><dd>Los electrones ocupan orbitales moleculares extendidos sobre toda la molécula.</dd>
+      <dt>Conceptos clave</dt><dd>LCAO, orbitales enlazantes y antienlazantes, orden de enlace.</dd>
+      <dt>Explica bien</dt><dd>Paramagnetismo del O<sub>2</sub>, espectros, polaridad y deslocalización.</dd>
+      <dt>Limitación principal</dt><dd>Es más abstracta y no da la geometría de forma directa.</dd>
+    </dl>
+  </aside>
+
+  <p class="lead">La TOM describe a los electrones de una molécula con orbitales moleculares que se extienden por todos los núcleos, y mide la estabilidad del enlace con el orden de enlace.</p>
+  <div class="toc"><strong>Contenido</strong></div>
+
+  <h2>Orbitales moleculares y método LCAO</h2>
+  <p>La Teoría de Orbitales Moleculares (TOM) describe a los electrones de una molécula mediante orbitales moleculares (OM), funciones de onda que se extienden sobre los núcleos de toda la molécula en lugar de limitarse a un par de átomos. Así como en un átomo los electrones ocupan orbitales atómicos (OA), en una molécula ocupan OM, y cada OM admite como máximo dos electrones con espines opuestos (Atkins et al., 2018).</p>
+  <p>Para construir los OM se emplea la combinación lineal de orbitales atómicos (LCAO, por sus siglas en inglés): cada OM se escribe como una suma o una resta de los OA de los átomos que forman la molécula. En el caso más simple, el H<sub>2</sub>, los dos orbitales 1s (φ<sub>A</sub> y φ<sub>B</sub>) producen dos OM:</p>
+  <p class="eq">ψ(σ1s) = c (φ<sub>A</sub> + φ<sub>B</sub>)&emsp;&emsp;ψ(σ*1s) = c (φ<sub>A</sub> − φ<sub>B</sub>)</p>
+  <p>donde <i>c</i> es una constante de normalización. La combinación en fase (suma) refuerza la función de onda entre los núcleos y da un OM <strong>enlazante</strong>, de menor energía que los OA de partida. La combinación en oposición de fase (resta) la anula en un plano situado entre los núcleos, llamado nodo, y da un OM <strong>antienlazante</strong>, de mayor energía (Brown et al., 2018). La letra σ indica un OM con simetría cilíndrica alrededor del eje que une los núcleos, la letra π un OM con un plano nodal que contiene a ese eje, y el asterisco (*) señala un OM antienlazante.</p>
+  <figure>
+    <svg viewBox="0 0 520 190" role="img" aria-label="OM enlazante σ1s con densidad entre los núcleos y OM antienlazante σ*1s con un nodo entre los núcleos">
+      <line x1="30" y1="85" x2="230" y2="85" stroke="#556176" stroke-dasharray="4 4"/>
+      <circle cx="100" cy="85" r="40" fill="#2563C9" fill-opacity=".4" stroke="#2563C9" stroke-width="1.5"/>
+      <circle cx="160" cy="85" r="40" fill="#2563C9" fill-opacity=".4" stroke="#2563C9" stroke-width="1.5"/>
+      <circle cx="100" cy="85" r="3.5" fill="#16202E"/><circle cx="160" cy="85" r="3.5" fill="#16202E"/>
+      <text x="130" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#2563C9">σ1s (enlazante)</text>
+      <text x="130" y="177" text-anchor="middle" font-size="12" fill="#556176">densidad entre los núcleos</text>
+      <line x1="290" y1="85" x2="500" y2="85" stroke="#556176" stroke-dasharray="4 4"/>
+      <circle cx="345" cy="85" r="38" fill="#2563C9" fill-opacity=".4" stroke="#2563C9" stroke-width="1.5"/>
+      <circle cx="435" cy="85" r="38" fill="#D9480F" fill-opacity=".4" stroke="#D9480F" stroke-width="1.5"/>
+      <line x1="390" y1="35" x2="390" y2="135" stroke="#16202E" stroke-dasharray="3 3"/>
+      <circle cx="345" cy="85" r="3.5" fill="#16202E"/><circle cx="435" cy="85" r="3.5" fill="#16202E"/>
+      <text x="390" y="28" text-anchor="middle" font-size="11" fill="#16202E">nodo</text>
+      <text x="390" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#A8370A">σ*1s (antienlazante)</text>
+      <text x="390" y="177" text-anchor="middle" font-size="12" fill="#556176">sin densidad en el nodo</text>
+    </svg>
+    <figcaption>Figura 3. Dos orbitales 1s se combinan y generan dos orbitales moleculares. Elaboración propia con fines didácticos.</figcaption>
+  </figure>
+
+  <h2>Reglas para construir y llenar los OM</h2>
+  <ul class="tight">
+    <li>Al combinar <em>n</em> orbitales atómicos se obtienen <em>n</em> orbitales moleculares.</li>
+    <li>Dos OA se combinan de forma efectiva cuando tienen energías parecidas, simetría compatible y un solapamiento apreciable.</li>
+    <li>Los electrones llenan los OM desde el de menor energía (principio de Aufbau), con un máximo de dos por orbital y espines opuestos (principio de exclusión de Pauli).</li>
+    <li>Cuando hay OM de igual energía, se coloca un electrón en cada uno antes de aparear (regla de Hund).</li>
+    <li>Un electrón en un OM enlazante estabiliza la molécula; un electrón en un OM antienlazante la desestabiliza.</li>
+  </ul>
+  <p>Estas reglas se aplican a los orbitales de valencia (Brown et al., 2018; Atkins et al., 2018).</p>
+
+  <h2>Orden de enlace</h2>
+  <p>El orden de enlace (OE) resume cuántos enlaces netos hay entre dos átomos:</p>
+  <p class="eq">OE = (n.º de e<sup>−</sup> en OM enlazantes − n.º de e<sup>−</sup> en OM antienlazantes) / 2</p>
+  <p>Un orden de enlace mayor que cero indica que la especie puede ser estable, y cuanto mayor es, más corto y más fuerte tiende a ser el enlace. Un orden de enlace igual a cero indica que no se espera que se forme una molécula estable (Brown et al., 2018). Así, el H<sub>2</sub> tiene OE = 1; el ion H<sub>2</sub><sup>+</sup>, con un solo electrón en el OM enlazante, OE = 0,5; y el He<sub>2</sub>, que llena tanto σ1s como σ*1s, OE = 0. Además, si algún OM contiene electrones desapareados, la especie es paramagnética; si todos están apareados, es diamagnética.</p>
+  <p>La tabla resume el resultado para las moléculas diatómicas homonucleares del segundo período, considerando solo los electrones de valencia.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Especie</th><th>e<sup>−</sup> de valencia</th><th>Configuración de valencia</th><th>Orden de enlace</th><th>Magnetismo</th></tr></thead>
+      <tbody>
+        <tr><td>B<sub>2</sub></td><td>6</td><td>(σ2s)² (σ*2s)² (π2p)²</td><td>1</td><td>Paramagnética</td></tr>
+        <tr><td>C<sub>2</sub></td><td>8</td><td>(σ2s)² (σ*2s)² (π2p)⁴</td><td>2</td><td>Diamagnética</td></tr>
+        <tr><td>N<sub>2</sub></td><td>10</td><td>(σ2s)² (σ*2s)² (π2p)⁴ (σ2p)²</td><td>3</td><td>Diamagnética</td></tr>
+        <tr><td>O<sub>2</sub></td><td>12</td><td>(σ2s)² (σ*2s)² (σ2p)² (π2p)⁴ (π*2p)²</td><td>2</td><td>Paramagnética</td></tr>
+        <tr><td>F<sub>2</sub></td><td>14</td><td>(σ2s)² (σ*2s)² (σ2p)² (π2p)⁴ (π*2p)⁴</td><td>1</td><td>Diamagnética</td></tr>
+        <tr><td>Ne<sub>2</sub></td><td>16</td><td>(σ2s)² (σ*2s)² (σ2p)² (π2p)⁴ (π*2p)⁴ (σ*2p)²</td><td>0</td><td>No se espera una molécula estable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Diagrama de orbitales moleculares</h2>
+  <p>Elige una especie para ver cómo se llenan sus orbitales moleculares de valencia (se omiten los orbitales 1s). El diagrama calcula el orden de enlace y el magnetismo con las reglas anteriores.</p>
+  <div class="lab">
+    <div class="ctrl">
+      <label for="sp">Especie</label>
+      <select id="sp"></select>
+    </div>
+    <svg id="mo" viewBox="0 0 560 370" role="img" aria-label="Diagrama de orbitales moleculares de la especie seleccionada"></svg>
+    <div class="readout" id="moout" aria-live="polite"></div>
+    <p class="note">Azul: OM enlazantes. Naranja: OM antienlazantes. Hasta el N<sub>2</sub> (y sus iones), la mezcla entre los orbitales 2s y 2p coloca los OM π2p por debajo del σ2p; desde el O<sub>2</sub> el orden se invierte (Atkins et al., 2018).</p>
+  </div>
+
+  <h2>Qué explica bien la TOM</h2>
+  <h3>El oxígeno molecular (O<sub>2</sub>)</h3>
+  <p>El O<sub>2</sub> es el ejemplo clásico del éxito de la TOM. Con 12 electrones de valencia, su configuración es (σ2s)² (σ*2s)² (σ2p)² (π2p)⁴ (π*2p)². Los dos últimos electrones se distribuyen en los dos orbitales π*2p, que tienen la misma energía, y por la regla de Hund quedan desapareados. El orden de enlace es (8 − 4)/2 = 2, coherente con un doble enlace, pero con dos electrones desapareados, lo que explica que el O<sub>2</sub> sea paramagnético y sea atraído por un campo magnético (Atkins et al., 2018; Brown et al., 2018). Es justamente el caso en que la TEV, con su estructura O=O de electrones apareados, no concuerda con el experimento.</p>
+  <p>La serie O<sub>2</sub><sup>+</sup>, O<sub>2</sub>, O<sub>2</sub><sup>−</sup> y O<sub>2</sub><sup>2−</sup> tiene órdenes de enlace de 2,5; 2; 1,5 y 1. La TOM predice que la distancia O–O aumenta a medida que el orden de enlace disminuye, porque cada electrón extra entra en un OM antienlazante.</p>
+
+  <h3>El monóxido de carbono (CO)</h3>
+  <p>El CO tiene 10 electrones de valencia, igual que el N<sub>2</sub>, y su orden de enlace es 3. A diferencia del N<sub>2</sub>, sus átomos son distintos: el oxígeno es más electronegativo y sus orbitales atómicos tienen menor energía. Por eso los OM enlazantes se parecen más a los orbitales del oxígeno y los antienlazantes, a los del carbono. Este desequilibrio explica la polaridad del enlace, algo que la TOM trata de forma natural en las moléculas heteronucleares. Además, es consistente con que el CO se enlace a los metales a través del átomo de carbono en los carbonilos metálicos (Atkins et al., 2018).</p>
+
+  <h3>El benceno (C<sub>6</sub>H<sub>6</sub>)</h3>
+  <p>En el benceno, los seis orbitales p no hibridados, uno por cada carbono, se combinan para formar seis OM π: tres enlazantes y tres antienlazantes. Los seis electrones π llenan los tres OM enlazantes, que abarcan todo el anillo. La densidad electrónica π queda deslocalizada sobre los seis carbonos, lo que explica por qué los enlaces C–C son equivalentes y por qué el anillo es especialmente estable. Es la descripción que la TOM ofrece de forma directa para el mismo fenómeno que la TEV representa con estructuras de resonancia (Brown et al., 2018).</p>
+
+  <h2>Limitaciones de la TOM</h2>
+  <ul class="tight">
+    <li><strong>Abstracción y cálculo:</strong> es más abstracta y matemática que la TEV. Para moléculas grandes, obtener orbitales y energías cuantitativas exige cálculos por computadora.</li>
+    <li><strong>Aproximación orbital:</strong> en su forma más simple asigna cada electrón a un orbital y trata la repulsión entre electrones de manera promediada, por lo que sus resultados cuantitativos son aproximados (Atkins et al., 2018).</li>
+    <li><strong>Geometría y enlaces individuales:</strong> los OM deslocalizados no se asocian de forma directa con enlaces concretos ni con los ángulos de enlace. Por eso, para predecir la forma de una molécula o razonar en química orgánica, suele ser más práctico usar la TEV y la hibridación.</li>
+    <li><strong>Diagramas cualitativos:</strong> el diagrama de OM de las diatómicas homonucleares es un esquema. El orden de energía de algunos OM cambia de una especie a otra, como se vio entre el N<sub>2</sub> y el O<sub>2</sub>.</li>
+  </ul>
+
+  <p class="see"><strong>Véase también:</strong> <button class="link" type="button" data-goto="tev">Teoría del enlace de valencia</button>, <button class="link" type="button" data-goto="comp">Comparación y conclusiones</button>.</p>
+</article>
+
+<!-- ================= COMPARACIÓN ================= -->
+<article class="art" id="p-comp" data-id="comp" hidden>
+  <h1>Comparación y conclusiones</h1>
+  <p class="lead">La TEV y la TOM son aproximaciones distintas a la misma realidad cuántica. Cada una destaca aspectos que la otra describe con menos facilidad.</p>
+  <div class="toc"><strong>Contenido</strong></div>
+
+  <h2>Tabla comparativa</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Aspecto</th><th>TEV</th><th>TOM</th></tr></thead>
+      <tbody>
+        <tr><td>Idea del enlace</td><td>Solapamiento de orbitales atómicos; pareja de electrones localizada entre dos átomos.</td><td>Electrones en orbitales moleculares extendidos sobre toda la molécula.</td></tr>
+        <tr><td>Orbitales que usa</td><td>Orbitales atómicos, puros o híbridos.</td><td>Orbitales moleculares obtenidos por LCAO.</td></tr>
+        <tr><td>Geometría molecular</td><td>La explica con la hibridación.</td><td>No la predice de forma directa; depende de la simetría y del cálculo.</td></tr>
+        <tr><td>Deslocalización</td><td>Mediante resonancia entre estructuras.</td><td>Surge de forma natural en los OM.</td></tr>
+        <tr><td>Medida de la estabilidad</td><td>Número de pares compartidos y grado de solapamiento.</td><td>Orden de enlace: (e<sup>−</sup> enlazantes − e<sup>−</sup> antienlazantes) / 2; puede ser fraccionario.</td></tr>
+        <tr><td>Paramagnetismo del O<sub>2</sub></td><td>No lo predice con la estructura O=O.</td><td>Lo explica con dos electrones desapareados en π*2p.</td></tr>
+        <tr><td>Espectros y estados excitados</td><td>Descripción limitada.</td><td>Buena base conceptual.</td></tr>
+        <tr><td>Facilidad de uso</td><td>Intuitiva y cercana a las estructuras de Lewis.</td><td>Más abstracta, pero más general.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Respuesta a la pregunta guía</h2>
+  <p>Ambas teorías explican la formación del enlace como un descenso de energía: cuando los electrones pasan a ocupar regiones donde son atraídos por varios núcleos a la vez, el sistema es más estable que los átomos separados.</p>
+  <p>En la TEV, esa estabilización proviene del solapamiento de dos orbitales atómicos y de la pareja de electrones, con espines opuestos, que queda localizada entre los núcleos. A mayor solapamiento, mayor estabilidad. Este razonamiento explica los enlaces σ y π, la hibridación y la geometría de las moléculas.</p>
+  <p>En la TOM, los electrones ocupan orbitales moleculares extendidos. La estabilidad depende del balance entre los electrones que están en orbitales enlazantes y los que están en antienlazantes, y se resume en el orden de enlace. Un orden de enlace positivo implica que el enlace se forma; uno igual a cero, que no.</p>
+
+  <h2>Análisis</h2>
+  <p>Las dos teorías no compiten. La TEV es más rápida cuando se necesita predecir la forma de una molécula o razonar un mecanismo en química orgánica. La TOM es la herramienta adecuada cuando importan las propiedades magnéticas, los espectros o los electrones deslocalizados. El caso del O<sub>2</sub> muestra por qué conviene conocer ambas: la TEV da una imagen intuitiva del doble enlace, pero solo la TOM explica que la molécula sea paramagnética (Atkins et al., 2018).</p>
+  <p>Cuando cada teoría se refina hasta incluir todas las interacciones entre los electrones, ambas conducen a descripciones equivalentes. Por eso es preferible verlas como dos lenguajes complementarios y no como una teoría correcta y otra errónea.</p>
+
+  <h2>Conclusiones</h2>
+  <ul class="tight">
+    <li>La TEV y la TOM explican la formación del enlace desde dos puntos de vista: electrones localizados en pares y electrones deslocalizados en orbitales moleculares.</li>
+    <li>La hibridación, la resonancia y los enlaces σ y π hacen de la TEV una herramienta eficaz para la geometría y la reactividad.</li>
+    <li>El orden de enlace, los orbitales enlazantes y antienlazantes y el diagrama de OM hacen de la TOM una herramienta eficaz para el magnetismo, los espectros y la deslocalización.</li>
+    <li>Todo modelo es una aproximación: su valor está en lo que explica y en lo que deja de explicar, y reconocer esos límites es parte de comprender el enlace químico.</li>
+  </ul>
+
+  <p class="see"><strong>Véase también:</strong> <button class="link" type="button" data-goto="tev">Teoría del enlace de valencia</button>, <button class="link" type="button" data-goto="tom">Teoría de orbitales moleculares</button>, <button class="link" type="button" data-goto="quiz">Autoevaluación</button>.</p>
+</article>
+
+<!-- ================= AUTOEVALUACIÓN ================= -->
+<article class="art" id="p-quiz" data-id="quiz" hidden>
+  <h1>Autoevaluación</h1>
+  <p>Responde las ocho preguntas y pulsa «Comprobar respuestas». Puedes reintentar las veces que quieras.</p>
+  <div id="quizbox"></div>
+  <p>
+    <button class="btn" id="chk" type="button">Comprobar respuestas</button>
+    <button class="btn alt" id="rst" type="button">Reintentar</button>
+    <span id="score" aria-live="polite"></span>
+  </p>
+</article>
+
+<!-- ================= REFERENCIAS ================= -->
+<article class="art" id="p-ref" data-id="ref" hidden>
+  <h1>Referencias</h1>
+  <p>Las citas dentro del texto siguen el formato APA (autor, año). Todas las fuentes son libros, artículos científicos o una conferencia Nobel.</p>
+  <ul class="refs">
+    <li>Atkins, P., de Paula, J., &amp; Keeler, J. (2018). <i>Atkins' physical chemistry</i> (11.ª ed.). Oxford University Press.</li>
+    <li>Brown, T. L., LeMay, H. E., Bursten, B. E., Murphy, C. J., Woodward, P. M., &amp; Stoltzfus, M. W. (2018). <i>Chemistry: The central science</i> (14.ª ed.). Pearson.</li>
+    <li>Gillespie, R. J., &amp; Robinson, E. A. (2007). Gilbert N. Lewis and the chemical bond: The electron pair and the octet rule from 1916 to the present day. <i>Journal of Computational Chemistry, 28</i>(1), 87–97. https://doi.org/10.1002/jcc.20545</li>
+    <li>Heitler, W., &amp; London, F. (1927). Wechselwirkung neutraler Atome und homöopolare Bindung nach der Quantenmechanik. <i>Zeitschrift für Physik, 44</i>(6–7), 455–472.</li>
+    <li>Lewis, G. N. (1916). The atom and the molecule. <i>Journal of the American Chemical Society, 38</i>(4), 762–785.</li>
+    <li>Mulliken, R. S. (1966, 12 de diciembre). <i>Spectroscopy, molecular orbitals, and chemical bonding</i> [Conferencia Nobel]. NobelPrize.org. https://www.nobelprize.org/prizes/chemistry/1966/mulliken/lecture/</li>
+    <li>Pauling, L. (1931). The nature of the chemical bond. Application of results obtained from the quantum mechanics and from a theory of paramagnetic susceptibility to the structure of molecules. <i>Journal of the American Chemical Society, 53</i>(4), 1367–1400.</li>
+    <li>Pauling, L. (1960). <i>The nature of the chemical bond and the structure of molecules and crystals: An introduction to modern structural chemistry</i> (3.ª ed.). Cornell University Press.</li>
+  </ul>
+</article>
+
+<!-- ================= EQUIPO ================= -->
+<article class="art" id="p-equipo" data-id="equipo" hidden>
+  <h1>Equipo de trabajo</h1>
+  <p>Wiki elaborada de forma colaborativa para la Actividad de Aprendizaje n.º 6, sobre las teorías de enlace químico.</p>
+  <dl class="kv" style="margin:0 0 1em">
+    <dt>Universidad</dt><dd>Universidad de Panamá</dd>
+    <dt>Facultad</dt><dd>Facultad de Ciencias Naturales, Exactas y Tecnología</dd>
+    <dt>Curso</dt><dd>Química Inorgánica 1</dd>
+    <dt>Grupo</dt><dd>2-1D</dd>
+    <dt>Periodo</dt><dd>Segundo semestre de 2026</dd>
+    <dt>Profesor</dt><dd>Mario Friederici</dd>
+  </dl>
+  <h2>Integrantes y aportes</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Integrante</th><th>Aporte a esta wiki</th></tr></thead>
+      <tbody>
+        <tr><td>Brown, Kevin</td><td>Parte de la TOM, montaje técnico y publicación de la wiki; estructura y armado colaborativo</td></tr>
+        <tr><td>Ortega, Loreyn</td><td>Estructura de la wiki, sugerencias de contenido y armado colaborativo</td></tr>
+        <tr><td>Jiménez, Yerly</td><td>Estructura de la wiki, sugerencias de contenido y armado colaborativo</td></tr>
+        <tr><td>Quiros, Estephanie</td><td>Estructura de la wiki, sugerencias de contenido y armado colaborativo</td></tr>
+        <tr><td>Vásquez, Silvia</td><td>Estructura de la wiki, sugerencias de contenido y armado colaborativo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</article>
+
+  </main>
+</div>
+<footer>Wiki del enlace químico. Última edición: octubre de 2026.</footer>
+
+<script>
+(function(){
+  var $ = function(s, c){ return (c || document).querySelector(s); };
+  var $$ = function(s, c){ return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  /* ---------- Navegación entre artículos ---------- */
+  var panels = $$('.art');
+  var navBtns = $$('.side button');
+  function show(id){
+    panels.forEach(function(p){ p.hidden = (p.dataset.id !== id); });
+    navBtns.forEach(function(b){
+      if(b.dataset.go === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    window.scrollTo(0, 0);
+  }
+  navBtns.forEach(function(b){ b.addEventListener('click', function(){ show(b.dataset.go); }); });
+  $$('[data-goto]').forEach(function(b){ b.addEventListener('click', function(){ show(b.dataset.goto); }); });
+
+  /* ---------- Numeración de secciones y contenido ---------- */
+  panels.forEach(function(p){
+    var toc = $('.toc', p);
+    if(!toc) return;
+    var hs = $$('h2, h3', p).filter(function(h){ return !h.closest('.infobox') && !h.closest('.toc'); });
+    var a = 0, b = 0, ul = document.createElement('ul');
+    hs.forEach(function(h){
+      var num;
+      if(h.tagName === 'H2'){ a++; b = 0; num = String(a); } else { b++; num = a + '.' + b; }
+      var txt = h.textContent;
+      h.id = p.dataset.id + '-' + num.replace('.', '_');
+      var sp = document.createElement('span'); sp.className = 'num'; sp.textContent = num + ' ';
+      h.insertBefore(sp, h.firstChild);
+      var li = document.createElement('li'); li.className = (h.tagName === 'H3') ? 'l2' : 'l1';
+      var lk = document.createElement('a'); lk.href = '#' + h.id; lk.textContent = num + ' ' + txt;
+      lk.addEventListener('click', function(e){
+        e.preventDefault();
+        h.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'});
+      });
+      li.appendChild(lk); ul.appendChild(li);
+    });
+    toc.appendChild(ul);
+  });
+
+  /* ---------- Búsqueda ---------- */
+  function norm(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+  var index = panels.map(function(p){
+    return {id: p.dataset.id, title: $('h1', p).textContent, text: norm(p.textContent)};
+  });
+  var qin = $('#q'), box = $('#results');
+  qin.addEventListener('input', function(){
+    var q = norm(qin.value.trim());
+    box.innerHTML = '';
+    if(q.length < 3){ box.hidden = true; return; }
+    var hits = index.map(function(x){
+      var n = x.text.split(q).length - 1; return {x: x, n: n};
+    }).filter(function(h){ return h.n > 0; }).sort(function(u, v){ return v.n - u.n; });
+    if(!hits.length){
+      var none = document.createElement('p'); none.textContent = 'Sin resultados.'; box.appendChild(none);
+    } else {
+      hits.forEach(function(h){
+        var bt = document.createElement('button'); bt.type = 'button';
+        bt.textContent = h.x.title;
+        var sm = document.createElement('small'); sm.textContent = h.n + (h.n === 1 ? ' coincidencia' : ' coincidencias');
+        bt.appendChild(sm);
+        bt.addEventListener('click', function(){ show(h.x.id); box.hidden = true; qin.value = ''; });
+        box.appendChild(bt);
+      });
+    }
+    box.hidden = false;
+  });
+  document.addEventListener('click', function(e){ if(!e.target.closest('.search')) box.hidden = true; });
+
+  /* ---------- H2: distancia y energía ---------- */
+  var D = 436, A = 0.0194, R0 = 74;
+  function E(r){ var x = 1 - Math.exp(-A * (r - R0)); return D * (x * x - 1); }
+  function X(r){ return 44 + (r - 50) / 250 * 280; }
+  function Y(e){ return 36 + (-e / D) * 130; }
+  var d = '';
+  for(var r = 50; r <= 300; r += 2){ d += (r === 50 ? 'M' : 'L') + X(r).toFixed(1) + ' ' + Y(E(r)).toFixed(1) + ' '; }
+  $('#curve').setAttribute('d', d);
+  var r0l = $('#r0line'); r0l.setAttribute('x1', X(R0)); r0l.setAttribute('x2', X(R0));
+  $('#x74').setAttribute('x', X(R0) + 18);
+  [100, 200, 300].forEach(function(v){ $('#x' + v).setAttribute('x', X(v)); });
+  function updH2(){
+    var r = +$('#rng').value, e = E(r), sep = r * 0.8;
+    $('#aL').setAttribute('cx', 200 - sep / 2); $('#nL').setAttribute('cx', 200 - sep / 2); $('#tL').setAttribute('x', 200 - sep / 2);
+    $('#aR').setAttribute('cx', 200 + sep / 2); $('#nR').setAttribute('cx', 200 + sep / 2); $('#tR').setAttribute('x', 200 + sep / 2);
+    $('#mk').setAttribute('cx', X(r)); $('#mk').setAttribute('cy', Y(e));
+    var msg;
+    if(r < 66) msg = 'Los núcleos están demasiado cerca: la repulsión domina y la energía vuelve a subir.';
+    else if(r <= 82) msg = 'Mínimo de energía: esta distancia es la longitud de enlace del H₂.';
+    else if(r <= 160) msg = 'Los orbitales 1s se solapan: los átomos se atraen y la energía baja al acercarse.';
+    else msg = 'Casi no hay solapamiento: los átomos se comportan como independientes.';
+    var ev = String(Math.round(e)).replace('-', '−');
+    $('#h2out').innerHTML = '<strong>r = ' + r + ' pm, E ≈ ' + ev + ' kJ/mol.</strong> ' + msg;
+  }
+  $('#rng').addEventListener('input', updH2);
+  updH2();
+
+  /* ---------- Resonancia del carbonato ---------- */
+  (function(){
+    var cxs = [90, 300, 510], cy = 82, OO = [[0, -42], [-37, 25], [37, 25]];
+    var ink = '#16202E', s = '';
+    function ln(x1, y1, x2, y2){ return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="' + ink + '" stroke-width="2" stroke-linecap="round"/>'; }
+    for(var k = 0; k < 3; k++){
+      var cx = cxs[k];
+      for(var j = 0; j < 3; j++){
+        var dx = OO[j][0], dy = OO[j][1], L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var x1 = cx + ux * 13, y1 = cy + uy * 13, x2 = cx + dx - ux * 13, y2 = cy + dy - uy * 13;
+        if(j === k){ s += ln(x1 + px * 3, y1 + py * 3, x2 + px * 3, y2 + py * 3) + ln(x1 - px * 3, y1 - py * 3, x2 - px * 3, y2 - py * 3); }
+        else { s += ln(x1, y1, x2, y2); }
+        var ox = cx + dx, oy = cy + dy;
+        s += '<text x="' + ox + '" y="' + (oy + 6) + '" text-anchor="middle" font-size="18" font-weight="700" fill="' + ink + '">O</text>';
+        if(j !== k){
+          var chx = (j === 1) ? ox - 17 : ox + 17;
+          s += '<text x="' + chx + '" y="' + (oy - 6) + '" text-anchor="middle" font-size="16" font-weight="700" fill="#A8370A">−</text>';
+        }
+      }
+      s += '<text x="' + cx + '" y="' + (cy + 6) + '" text-anchor="middle" font-size="18" font-weight="700" fill="' + ink + '">C</text>';
+    }
+    s += '<text x="195" y="' + (cy + 7) + '" text-anchor="middle" font-size="24" fill="#143A7A">↔</text>';
+    s += '<text x="405" y="' + (cy + 7) + '" text-anchor="middle" font-size="24" fill="#143A7A">↔</text>';
+    $('#res').innerHTML = s;
+  })();
+
+  /* ---------- Diagrama de OM ---------- */
+  var SP = [
+    {l:'B₂', e:6, o:'A'}, {l:'C₂', e:8, o:'A'}, {l:'N₂⁺', e:9, o:'A'}, {l:'N₂', e:10, o:'A'},
+    {l:'O₂⁺', e:11, o:'B'}, {l:'O₂', e:12, o:'B'}, {l:'O₂⁻', e:13, o:'B'}, {l:'O₂²⁻', e:14, o:'B'},
+    {l:'F₂', e:14, o:'B'}, {l:'Ne₂', e:16, o:'B'}
+  ];
+  var LV = {
+    sig2s:{name:'σ2s', n:1, b:true},   sigs2s:{name:'σ*2s', n:1, b:false},
+    pi2p:{name:'π2p', n:2, b:true},    sig2p:{name:'σ2p', n:1, b:true},
+    pis2p:{name:'π*2p', n:2, b:false}, sigs2p:{name:'σ*2p', n:1, b:false}
+  };
+  var ORD = {
+    A:['sig2s','sigs2s','pi2p','sig2p','pis2p','sigs2p'],
+    B:['sig2s','sigs2s','sig2p','pi2p','pis2p','sigs2p']
+  };
+  var SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  function sup(n){ return String(n).split('').map(function(c){ return SUP[+c]; }).join(''); }
+  var sel = $('#sp');
+  SP.forEach(function(s, i){
+    var o = document.createElement('option'); o.value = i; o.textContent = s.l + ' (' + s.e + ' e⁻ de valencia)';
+    if(s.l === 'O₂') o.selected = true;
+    sel.appendChild(o);
+  });
+  function drawMO(){
+    var sp = SP[+sel.value], ord = ORD[sp.o], ys = [340, 280, 215, 170, 125, 70];
+    var rem = sp.e, bond = 0, anti = 0, unp = 0, conf = [];
+    var grey = '#556176', cs = '', ms = '';
+    var axis = '<line x1="12" y1="354" x2="12" y2="40" stroke="' + grey + '" stroke-width="1.5"/>' +
+               '<polygon points="12,32 7,46 17,46" fill="' + grey + '"/>' +
+               '<text x="22" y="46" font-size="12" fill="' + grey + '">Energía</text>';
+    var ao = '';
+    ao += '<line x1="40" y1="310" x2="112" y2="310" stroke="' + grey + '" stroke-width="2.5"/><text x="76" y="330" text-anchor="middle" font-size="12" fill="' + grey + '">2s</text>';
+    ao += '<line x1="442" y1="310" x2="514" y2="310" stroke="' + grey + '" stroke-width="2.5"/><text x="478" y="330" text-anchor="middle" font-size="12" fill="' + grey + '">2s</text>';
+    for(var i = 0; i < 3; i++){
+      ao += '<line x1="' + (40 + i * 30) + '" y1="142" x2="' + (64 + i * 30) + '" y2="142" stroke="' + grey + '" stroke-width="2.5"/>';
+      ao += '<line x1="' + (436 + i * 30) + '" y1="142" x2="' + (460 + i * 30) + '" y2="142" stroke="' + grey + '" stroke-width="2.5"/>';
+    }
+    ao += '<text x="82" y="162" text-anchor="middle" font-size="12" fill="' + grey + '">2p</text><text x="478" y="162" text-anchor="middle" font-size="12" fill="' + grey + '">2p</text>';
+    ao += '<text x="82" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Átomo A</text><text x="478" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Átomo B</text>';
+    ord.forEach(function(k, i){
+      var L = LV[k], y = ys[i], n = L.n, col = L.b ? '#2563C9' : '#D9480F';
+      var take = Math.min(rem, 2 * n); rem -= take;
+      var occ = n === 1 ? [0] : [0, 0];
+      for(var j = 0; j < take; j++) occ[j % n]++;
+      if(L.b) bond += take; else anti += take;
+      if(take) conf.push('(' + L.name + ')' + sup(take));
+      var xs = n === 1 ? [[250, 310]] : [[225, 275], [285, 335]];
+      var left = xs[0][0], right = xs[xs.length - 1][1];
+      var is2s = (k === 'sig2s' || k === 'sigs2s');
+      var aoY = is2s ? 310 : 142, aoXl = is2s ? 112 : 124, aoXr = is2s ? 442 : 436;
+      cs += '<line x1="' + aoXl + '" y1="' + aoY + '" x2="' + left + '" y2="' + y + '" stroke="#C3CCDA" stroke-dasharray="3 3"/>';
+      cs += '<line x1="' + right + '" y1="' + y + '" x2="' + aoXr + '" y2="' + aoY + '" stroke="#C3CCDA" stroke-dasharray="3 3"/>';
+      xs.forEach(function(p, j){
+        ms += '<line x1="' + p[0] + '" y1="' + y + '" x2="' + p[1] + '" y2="' + y + '" stroke="' + col + '" stroke-width="3"/>';
+        var c = (p[0] + p[1]) / 2, o = occ[j];
+        if(o === 1) unp++;
+        if(o >= 1) ms += '<text x="' + (o === 2 ? c - 7 : c) + '" y="' + (y - 6) + '" text-anchor="middle" font-size="20" font-weight="700" fill="' + col + '">↑</text>';
+        if(o === 2) ms += '<text x="' + (c + 7) + '" y="' + (y - 6) + '" text-anchor="middle" font-size="20" font-weight="700" fill="' + col + '">↓</text>';
+      });
+      ms += '<text x="348" y="' + (y + 4) + '" font-size="13" fill="' + col + '">' + L.name + '</text>';
+    });
+    $('#mo').innerHTML = axis + ao + cs + ms;
+    var oe = (bond - anti) / 2, oeTxt = String(oe).replace('.', ',');
+    var mag = unp > 0
+      ? 'Paramagnética (' + unp + (unp === 1 ? ' electrón desapareado)' : ' electrones desapareados)')
+      : 'Diamagnética (todos los electrones apareados)';
+    var est = oe > 0 ? 'Se espera una especie estable.' : 'Orden de enlace 0: no se espera una molécula estable.';
+    var orden = sp.o === 'A' ? 'σ2p por encima de π2p (hay mezcla de orbitales 2s y 2p)' : 'σ2p por debajo de π2p';
+    $('#moout').innerHTML =
+      '<dl class="kv">' +
+      '<dt>Configuración</dt><dd>' + conf.join(' ') + '</dd>' +
+      '<dt>Orden de enlace</dt><dd><strong>' + oeTxt + '</strong> = (' + bond + ' − ' + anti + ') / 2</dd>' +
+      '<dt>Magnetismo</dt><dd>' + mag + '</dd>' +
+      '<dt>Estabilidad</dt><dd>' + est + '</dd>' +
+      '<dt>Orden de energía</dt><dd>' + orden + '</dd>' +
+      '</dl>';
+  }
+  sel.addEventListener('change', drawMO);
+  drawMO();
+
+  /* ---------- Autoevaluación ---------- */
+  var QZ = [
+    {q:'¿Quién propuso en 1916 que el enlace covalente es un par de electrones compartido?',
+     o:['Linus Pauling','Robert S. Mulliken','Gilbert N. Lewis','Heitler y London'],
+     a:2, why:'Lewis propuso en 1916 que los átomos comparten pares de electrones. Heitler y London dieron en 1927 la primera explicación cuántica.'},
+    {q:'Según la TEV, ¿cuántos enlaces σ y π tiene el N₂?',
+     o:['3 σ','1 σ y 2 π','2 σ y 1 π','1 σ y 1 π'],
+     a:1, why:'Un enlace triple está formado por un enlace σ y dos enlaces π.'},
+    {q:'¿Cuál es la hibridación de cada carbono en el eteno (C₂H₄)?',
+     o:['sp³','sp','sp²','sp³d'],
+     a:2, why:'Cada carbono forma tres enlaces σ y conserva un orbital p para el enlace π; por eso es sp² y su geometría es trigonal plana.'},
+    {q:'En el ion CO₃²⁻ los tres enlaces C–O son equivalentes. ¿Cómo lo explica la TEV?',
+     o:['Con resonancia: la estructura real es un híbrido y los electrones π están deslocalizados','El ion salta rápidamente entre tres estructuras distintas','Porque el carbono tiene hibridación sp³','Porque el carbono tiene el octeto expandido'],
+     a:0, why:'La estructura real no es ninguna de las tres dibujadas, sino un híbrido de resonancia con la densidad electrónica deslocalizada.'},
+    {q:'¿Qué teoría explica directamente que el O₂ sea paramagnético?',
+     o:['La TEV con la estructura O=O','La TOM: dos electrones desapareados ocupan los orbitales π*2p','La regla del octeto','Ninguna de las dos'],
+     a:1, why:'En la TOM los dos últimos electrones del O₂ ocupan por separado los dos orbitales π*2p, que tienen igual energía.'},
+    {q:'¿Cuál es el orden de enlace del O₂⁺, que tiene 11 electrones de valencia?',
+     o:['1,5','2','3','2,5'],
+     a:3, why:'Hay 8 electrones enlazantes y 3 antienlazantes: (8 − 3) / 2 = 2,5.'},
+    {q:'¿Qué resulta de combinar dos orbitales atómicos con fases opuestas?',
+     o:['Un OM enlazante de menor energía','Un OM antienlazante con un nodo entre los núcleos','Un orbital híbrido sp','No se forma ningún orbital'],
+     a:1, why:'La resta de las funciones de onda da un OM antienlazante, de mayor energía y con un nodo entre los núcleos.'},
+    {q:'¿Por qué no se espera que exista el He₂?',
+     o:['Tiene 4 electrones, 2 en σ1s y 2 en σ*1s, y su orden de enlace es 0','Los átomos de helio no tienen orbitales','Su orden de enlace es 1','Es paramagnético'],
+     a:0, why:'Los dos electrones antienlazantes cancelan el efecto de los dos enlazantes: (2 − 2) / 2 = 0.'}
+  ];
+  var qb = $('#quizbox');
+  QZ.forEach(function(it, i){
+    var f = document.createElement('fieldset');
+    var lg = document.createElement('legend'); lg.textContent = (i + 1) + '. ' + it.q; f.appendChild(lg);
+    it.o.forEach(function(t, j){
+      var l = document.createElement('label'), r = document.createElement('input');
+      r.type = 'radio'; r.name = 'q' + i; r.value = j;
+      l.appendChild(r); l.appendChild(document.createTextNode(' ' + t)); f.appendChild(l);
+    });
+    var fb = document.createElement('p'); fb.className = 'fb'; fb.id = 'fb' + i; f.appendChild(fb);
+    qb.appendChild(f);
+  });
+  $('#chk').addEventListener('click', function(){
+    var ok = 0, ans = 0;
+    QZ.forEach(function(it, i){
+      var s = document.querySelector('input[name="q' + i + '"]:checked'), fb = $('#fb' + i);
+      if(!s){ fb.textContent = 'Sin responder.'; fb.className = 'fb bad'; return; }
+      ans++;
+      if(+s.value === it.a){ ok++; fb.textContent = 'Correcto. ' + it.why; fb.className = 'fb ok'; }
+      else { fb.textContent = 'Revisa esta pregunta. ' + it.why; fb.className = 'fb bad'; }
+    });
+    $('#score').textContent = 'Aciertos: ' + ok + ' de ' + QZ.length + (ans < QZ.length ? ' (' + (QZ.length - ans) + ' sin responder)' : '') + '.';
+  });
+  $('#rst').addEventListener('click', function(){
+    $$('#quizbox input').forEach(function(r){ r.checked = false; });
+    $$('.fb').forEach(function(p){ p.textContent = ''; p.className = 'fb'; });
+    $('#score').textContent = '';
+  });
+})();
+</script>
+</body>
+</html>
